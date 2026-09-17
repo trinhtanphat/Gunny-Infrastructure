@@ -15,7 +15,7 @@
     {"requestPath":"/gunny/scripts/popup/script/popup.js","target":"gunny\\scripts\\popup\\script\\popup.js","sourceKind":"legacy-pinned","source":"gunny\\script\\popup.js","size":3104,"sha256":"751BF22C5F786F26A128201049142A9176FA863674A7A542B7CD1C098C0C564B","confidence":"medium-high"}
   ],
   "unresolved": [
-    {"requestPath":"/gunny/images/loop.jpg","status":"mitigated-live-source-unresolved","reason":"The original image remains absent from the authoritative 3.0 snapshot and pinned legacy bundle. DDTank-3.0 PR #8 (merge 9df6ee5502ef88de4a5328358ccf25740f9b0243) removed the broken CSS request while preserving the intended #ceebff background; continue archival search and do not fabricate the asset."},
+    {"requestPath":"/gunny/images/loop.jpg","status":"mitigated-live-source-unresolved","reason":"The original image remains absent from the authoritative 3.0 snapshot, pinned legacy bundle, UserHans02 mirror, and all seven current dk-khoado/Gunny-3.0 forks checked on 2026-09-17. DDTank-3.0 PR #8 (merge 9df6ee5502ef88de4a5328358ccf25740f9b0243) removed the broken CSS request while preserving the intended #ceebff background; do not fabricate the asset unless a provenance-backed source is found."},
     {"requestPath":"/config.xml","status":"not-required-by-real-client","reason":"Observed only from operator probes after /gunny/config.xml was healthy; do not create a root alias without a real client request."}
   ]
 }
