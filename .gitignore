@@ -1,0 +1,6 @@
+backups/
+manifest-backups/
+last-backup.txt
+server-instance.json
+fleet.json
+*.log

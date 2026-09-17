@@ -1,0 +1,26 @@
+{
+    "schemaVersion":  1,
+    "servers":  [
+                    {
+                        "name":  "gunny-001",
+                        "computerName":  "WIN-GUNNY-001",
+                        "publicHost":  "203.0.113.10",
+                        "enabled":  true,
+                        "infraRoot":  "C:\\Gunny-Infra"
+                    },
+                    {
+                        "name":  "gunny-002",
+                        "computerName":  "WIN-GUNNY-002",
+                        "publicHost":  "203.0.113.11",
+                        "enabled":  true,
+                        "infraRoot":  "C:\\Gunny-Infra"
+                    },
+                    {
+                        "name":  "gunny-003",
+                        "computerName":  "WIN-GUNNY-003",
+                        "publicHost":  "203.0.113.12",
+                        "enabled":  true,
+                        "infraRoot":  "C:\\Gunny-Infra"
+                    }
+                ]
+}

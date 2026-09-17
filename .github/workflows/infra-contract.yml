@@ -1,0 +1,14 @@
+name: Gunny Infra Contract
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  contract:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate bundle and fleet dry-run
+        shell: powershell
+        run: .\tests\Test-GunnyInfraContract.ps1
