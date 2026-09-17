@@ -44,3 +44,7 @@ Use `-Credential (Get-Credential)` if current Windows credentials cannot authent
 ## Repository safety
 
 Production `server-instance.json`, `fleet.json`, backups and logs are gitignored. The committed examples use RFC 5737 TEST-NET addresses. The `lib` directory contains the versioned endpoint apply engines, so the bundle does not depend on a `_recover` worktree or a particular Git checkout path on production servers.
+
+## Agent / automation endpoint rule
+
+Automated agents must read the root `AGENTS.md` before changing any Gunny/DDTank endpoint. Public-IP migration is manifest-driven only: `server-instance.json -> publicHost -> Set-GunnyPublicHost.ps1`. Direct cross-repository/runtime search-replace of production IPs is prohibited. If a location is not covered, extend the infrastructure apply/test contract first and then re-apply from the manifest.
