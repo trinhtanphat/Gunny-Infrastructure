@@ -44,3 +44,11 @@ Changing `publicHost` does not imply changing these edition ports.
 ## Required verification
 
 Before declaring endpoint work complete, run the infrastructure contract tests and verify the canonical apply result. Any new endpoint-bearing location must be brought under the infra apply/test contract instead of being maintained manually.
+
+
+## Project scope isolation
+
+- A Gunny task may touch only Gunny/DDTank infrastructure, source, runtime, resources, launcher/client-test artifacts, and explicitly named supporting repos.
+- Do not mutate unrelated projects such as QS3D, robot-boxing, ping-booster, invoice tooling, or other repositories merely because their worktrees/processes are visible on the same machine.
+- In a Gunny conversation, `continue all` means continue all pending work **inside the current Gunny scope** unless the user explicitly names another project.
+- Stale/background processes belonging to another project are unrelated machine state; ignore or leave them alone unless they directly block the Gunny task.
