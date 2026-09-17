@@ -72,7 +72,7 @@ $vRequiredFiles=@('AdminGunny\Web.config','SERVER\Fight\Fighting.Service.exe.con
 $vOptionalFiles=@('SERVER\Road\Road.Service.vshost.exe.config','htdocs\Config.php','index.html')
 foreach($rel in $vRequiredFiles){Copy-BackupFile $vRoot $rel $backupRoot 'v389'}
 foreach($rel in $vOptionalFiles){if(Test-Path -LiteralPath (Join-Path $vRoot $rel)){Copy-BackupFile $vRoot $rel $backupRoot 'v389'}}
-$dFiles=@('runtime\game\Road.Service.exe.config','runtime\center\Center.Service.exe.config','runtime\fighting\Fighting.Service.exe.config','webapps\Request\Web.config')
+$dFiles=@('runtime\game\Road.Service.exe.config','runtime\center\Center.Service.exe.config','runtime\fighting\Fighting.Service.exe.config','webapps\Request\Web.config','webroot\gunny\login.htm','webroot\gunny\config.xml','webroot\gunny\Web.config','webroot\Request\Web.config','webroot\Request\Tank.Request\Web.config','webroot\admingunny\Web.config')
 foreach($rel in $dFiles){Copy-BackupFile $dRoot $rel $backupRoot 'ddtank30'}
 $vCon=Read-AppSetting (Join-Path $vRoot 'SERVER\Road\Road.Service.exe.config') 'conString'
 $vRows=Get-ServerRows $vCon @($v.databaseServerIds|ForEach-Object{[int]$_})
