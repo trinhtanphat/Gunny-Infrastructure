@@ -11,8 +11,10 @@
     {"requestPath":"/gunny/image/unfrightprop/package5/icon.png","target":"image\\unfrightprop\\package5\\icon.png","source":"image/unfrightprop/package5/icon.png","size":4616,"sha256":"7875D91FD37D886D2D1C1865D45B0B7529DFD171B2C622E10530BE417D513274","confidence":"high"},
     {"requestPath":"/gunny/image/equip/f/cloth/cloth76/2/show.png","target":"image\\equip\\f\\cloth\\cloth76\\2\\show.png","source":"image/equip/f/cloth/cloth76/2/show.png","size":1804,"sha256":"0F7ABECB4FE85557F931D40A575C2407D378786C5047B4FA7E4A1C8C07D0665B","confidence":"high"},
     {"requestPath":"/gunny/image/equip/f/cloth/cloth76/3/show.png","target":"image\\equip\\f\\cloth\\cloth76\\3\\show.png","source":"image/equip/f/cloth/cloth76/3/show.png","size":2143,"sha256":"446DE9526A2AB9C506C63202097F49F3B879B506C61DDF30284EFF3856348228","confidence":"high"},
-    {"requestPath":"/gunny/image/equip/f/cloth/cloth76/1/show.png","target":"image\\equip\\f\\cloth\\cloth76\\1\\show.png","source":"image/equip/f/cloth/cloth76/1/show.png","size":6808,"sha256":"9515C4FDC10E6DEF131D91DBC51811B3D6E5519AFAADCAC93989AE3598A5D0E3","confidence":"high"}
+    {"requestPath":"/gunny/image/equip/f/cloth/cloth76/1/show.png","target":"image\\equip\\f\\cloth\\cloth76\\1\\show.png","source":"image/equip/f/cloth/cloth76/1/show.png","size":6808,"sha256":"9515C4FDC10E6DEF131D91DBC51811B3D6E5519AFAADCAC93989AE3598A5D0E3","confidence":"high"},
+    {"requestPath":"/gunny/image/unfrightprop/brightcolorspar/icon.png","target":"image\\unfrightprop\\brightcolorspar\\icon.png","source":"image/unfrightprop/brightcolorspar/icon.png","size":4686,"sha256":"066D3CE4D8032A4F07DDAB4862445D870E23FDFB6C23E48914E3C93246D001E4","confidence":"high"},
+    {"requestPath":"/gunny/image/arm/ghostaxe/1/icon.png","target":"image\\arm\\ghostaxe\\1\\icon.png","source":"image/arm/ghostaxe/1/icon.png","size":4129,"sha256":"D8CAA7D6807E2EE8F8C9EBB827ED2AA8B6BB78DFCC263799EBE1350FC64D559D","confidence":"high"}
   ],
-  "provenance": "All seven files matched byte-for-byte across local Resource38, Resource, and Resource-pnkl1999 copies before recovery; sourceRef pins the archived Resource38 state.",
-  "liveValidation": "Restored missing-only on 103.9.156.181 and verified HTTP 200 for all seven request paths on 2026-09-17."
+  "provenance": "All nine files matched byte-for-byte across local Resource38, Resource, and Resource-pnkl1999 copies before recovery; sourceRef pins the archived Resource38 state.",
+  "liveValidation": "Restored missing-only on 103.9.156.181 and verified HTTP 200 for all nine request paths on 2026-09-17; the final two were fresh Ruffle 404s brightcolorspar and ghostaxe."
 }
