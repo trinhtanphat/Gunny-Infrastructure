@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "family": "Gunny-v389/5-year",
+  "bundle": "residual-static-recovery-20260917",
+  "sourceRepo": "trinhtanphat/Resource38",
+  "sourceRef": "d88916533679b7fa59b893395439e84e104ac87b",
+  "assets": [
+    {"requestPath":"/gunny/image/unfrightprop/san1/icon.png","target":"image\\unfrightprop\\san1\\icon.png","source":"image/unfrightprop/san1/icon.png","size":3272,"sha256":"9CAA245BE8D876CD9BAE9BF35EF647C91629ABBFC441D4B9F51D4F1B71F438F3","confidence":"high"},
+    {"requestPath":"/gunny/image/unfrightprop/yuan1/icon.png","target":"image\\unfrightprop\\yuan1\\icon.png","source":"image/unfrightprop/yuan1/icon.png","size":3388,"sha256":"567C25BB1EB76AF39F8E5911C0F845282808412296BB05BF5F8C63B9C0554D84","confidence":"high"},
+    {"requestPath":"/gunny/image/unfrightprop/ssan1/icon.png","target":"image\\unfrightprop\\ssan1\\icon.png","source":"image/unfrightprop/ssan1/icon.png","size":4600,"sha256":"76ADDFAC323B1BCD6D7426848F815699CF7A1DA0F528059D478E2FB6F8487837","confidence":"high"},
+    {"requestPath":"/gunny/image/unfrightprop/package5/icon.png","target":"image\\unfrightprop\\package5\\icon.png","source":"image/unfrightprop/package5/icon.png","size":4616,"sha256":"7875D91FD37D886D2D1C1865D45B0B7529DFD171B2C622E10530BE417D513274","confidence":"high"},
+    {"requestPath":"/gunny/image/equip/f/cloth/cloth76/2/show.png","target":"image\\equip\\f\\cloth\\cloth76\\2\\show.png","source":"image/equip/f/cloth/cloth76/2/show.png","size":1804,"sha256":"0F7ABECB4FE85557F931D40A575C2407D378786C5047B4FA7E4A1C8C07D0665B","confidence":"high"},
+    {"requestPath":"/gunny/image/equip/f/cloth/cloth76/3/show.png","target":"image\\equip\\f\\cloth\\cloth76\\3\\show.png","source":"image/equip/f/cloth/cloth76/3/show.png","size":2143,"sha256":"446DE9526A2AB9C506C63202097F49F3B879B506C61DDF30284EFF3856348228","confidence":"high"},
+    {"requestPath":"/gunny/image/equip/f/cloth/cloth76/1/show.png","target":"image\\equip\\f\\cloth\\cloth76\\1\\show.png","source":"image/equip/f/cloth/cloth76/1/show.png","size":6808,"sha256":"9515C4FDC10E6DEF131D91DBC51811B3D6E5519AFAADCAC93989AE3598A5D0E3","confidence":"high"}
+  ],
+  "provenance": "All seven files matched byte-for-byte across local Resource38, Resource, and Resource-pnkl1999 copies before recovery; sourceRef pins the archived Resource38 state.",
+  "liveValidation": "Restored missing-only on 103.9.156.181 and verified HTTP 200 for all seven request paths on 2026-09-17."
+}
