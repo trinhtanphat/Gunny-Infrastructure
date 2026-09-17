@@ -24,6 +24,62 @@ function Set-AppSettingValue([string]$Path,[string]$Key,[string]$Value) {
     [IO.File]::WriteAllText($Path,$updated,$utf8)
 }
 
+function Get-AppSettingValue([string]$Path,[string]$Key) {
+    if (-not (Test-Path -LiteralPath $Path)) { return $null }
+    $raw = [IO.File]::ReadAllText($Path)
+    $pattern = '<add\s+key="' + [regex]::Escape($Key) + '"\s+value="([^"]*)"'
+    $match = [regex]::Match($raw,$pattern)
+    if (-not $match.Success) { return $null }
+    return [Net.WebUtility]::HtmlDecode($match.Groups[1].Value)
+}
+
+function Set-AppSettingValueIfPresent([string]$Path,[string]$Key,[string]$Value) {
+    if (-not (Test-Path -LiteralPath $Path)) { return }
+    $raw = [IO.File]::ReadAllText($Path)
+    $pattern = '(<add\s+key="' + [regex]::Escape($Key) + '"\s+value=")[^"]*(")'
+    if ([regex]::IsMatch($raw,$pattern)) { Set-AppSettingValue $Path $Key $Value }
+}
+
+function Set-XmlValueAttributeIfPresent([string]$Path,[string]$Element,[string]$Value) {
+    if (-not (Test-Path -LiteralPath $Path)) { return }
+    $raw = [IO.File]::ReadAllText($Path)
+    $pattern = '(<'+[regex]::Escape($Element)+'\s+value=")[^"]*(")'
+    if (-not [regex]::IsMatch($raw,$pattern)) { return }
+    $evaluator = [Text.RegularExpressions.MatchEvaluator]{ param($m) $m.Groups[1].Value + $Value + $m.Groups[2].Value }
+    $updated = [regex]::Replace($raw,$pattern,$evaluator,1)
+    [IO.File]::WriteAllText($Path,$updated,$utf8)
+}
+
+function Set-EndpointAddressIfPresent([string]$Path,[string]$Contract,[string]$Address) {
+    if (-not (Test-Path -LiteralPath $Path)) { return }
+    $raw = [IO.File]::ReadAllText($Path)
+    $pattern = '(<endpoint\b(?=[^>]*\bcontract="' + [regex]::Escape($Contract) + '")[^>]*\baddress=")[^"]*(")'
+    if (-not [regex]::IsMatch($raw,$pattern)) { return }
+    $evaluator = [Text.RegularExpressions.MatchEvaluator]{ param($m) $m.Groups[1].Value + $Address + $m.Groups[2].Value }
+    $updated = [regex]::Replace($raw,$pattern,$evaluator,1)
+    [IO.File]::WriteAllText($Path,$updated,$utf8)
+}
+
+function Get-DDTank30LegacyWebHost([string]$WebRoot) {
+    foreach ($path in @((Join-Path $WebRoot 'gunny\login.htm'),(Join-Path $WebRoot 'gunny\config.xml'))) {
+        if (-not (Test-Path -LiteralPath $path)) { continue }
+        $raw = [IO.File]::ReadAllText($path)
+        $match = [regex]::Match($raw,'https?://(?<host>\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?/(?:register|reg|Resource|gunny|request)/','IgnoreCase')
+        if ($match.Success) { return $match.Groups['host'].Value }
+    }
+    return $null
+}
+
+function Set-LegacyIpListHostIfPresent([string]$Path,[string]$Key,[string]$LegacyHost) {
+    if ([string]::IsNullOrWhiteSpace($LegacyHost)) { return }
+    $value = Get-AppSettingValue $Path $Key
+    if ($null -eq $value) { return }
+    $parts = @($value -split '\|' | ForEach-Object {
+        if ($_ -eq $LegacyHost -or $_.StartsWith($LegacyHost + '1') -or $_.StartsWith($LegacyHost + '7')) { $instance.PublicHost } else { $_ }
+    })
+    Set-AppSettingValue $Path $Key ($parts -join '|')
+}
+
 function Set-DDTank30ConfigSet([string]$Root,[switch]$RuntimeLayout) {
     if ($RuntimeLayout) {
         $game = Join-Path $Root 'game\Road.Service.exe.config'
@@ -73,11 +129,72 @@ if (-not $SkipSourceConfig) {
     }
 }
 
+function Set-DDTank30WebRoot([string]$WebRoot) {
+    if (-not (Test-Path -LiteralPath $WebRoot)) { return }
+    $base = "http://$($instance.PublicHost):$($instance.WebPort)"
+    $legacyHost = Get-DDTank30LegacyWebHost $WebRoot
+
+    $login = Join-Path $WebRoot 'gunny\login.htm'
+    if (Test-Path -LiteralPath $login) {
+        $raw = [IO.File]::ReadAllText($login)
+        $raw = [regex]::Replace($raw,'href="https?://[^\"]+(?:/reg/forgotpass\.html[^\"]*|/Register/forgotpass\.aspx)"','href="'+$base+'/Register/forgotpass.aspx"','IgnoreCase')
+        $raw = [regex]::Replace($raw,'href="https?://[^\"]+/register/"','href="'+$base+'/Register/"','IgnoreCase')
+        [IO.File]::WriteAllText($login,$raw,$utf8)
+    }
+
+    $config = Join-Path $WebRoot 'gunny\config.xml'
+    $xmlValues = @{
+        SITE = "$base/Resource/"
+        FIRSTPAGE = "$base/gunny/"
+        REGISTER = "$base/Register/"
+        REQUEST_PATH = "$base/Request/"
+        LOGIN_PATH = "$base/gunny/"
+        FILL_PATH = "$base/gunny/"
+    }
+    foreach ($key in $xmlValues.Keys) { Set-XmlValueAttributeIfPresent $config $key $xmlValues[$key] }
+
+    $gunnyWeb = Join-Path $WebRoot 'gunny\Web.config'
+    Set-AppSettingValueIfPresent $gunnyWeb 'LoginUrl' "$base/Request/createLogin.aspx"
+    Set-AppSettingValueIfPresent $gunnyWeb 'LoginOnUrl' "$base/gunny/login.htm"
+    Set-AppSettingValueIfPresent $gunnyWeb 'FlashUrl' "$base/gunny/index.aspx"
+
+    foreach ($rel in @('Request\Web.config','Request\Tank.Request\Web.config')) {
+        $request = Join-Path $WebRoot $rel
+        if (-not (Test-Path -LiteralPath $request)) { continue }
+        Set-RequestWebConfig $request
+        Set-LegacyIpListHostIfPresent $request 'AdminIP' $legacyHost
+        Set-LegacyIpListHostIfPresent $request 'SentRewardIP' $legacyHost
+        Set-EndpointAddressIfPresent $request 'CenterService.ICenterService' "net.tcp://$($instance.CenterHost):$($instance.CenterPort)/"
+    }
+
+    $admin = Join-Path $WebRoot 'admingunny\Web.config'
+    Set-AppSettingValueIfPresent $admin 'Resource' "$base/Resource/"
+    Set-AppSettingValueIfPresent $admin 'ServerIP' $instance.PublicHost
+    Set-EndpointAddressIfPresent $admin 'CenterService.ICenterService' "net.tcp://$($instance.CenterHost):$($instance.CenterPort)/"
+    Set-EndpointAddressIfPresent $admin 'WebLogin.PassPortSoap' "$base/admingunny/Flash_Port/PassPort.asmx"
+
+    if (-not [string]::IsNullOrWhiteSpace($legacyHost) -and $legacyHost -ne $instance.PublicHost) {
+        foreach ($rel in @('gunny\login.htm','gunny\config.xml','gunny\Web.config','Request\Web.config','Request\Tank.Request\Web.config','admingunny\Web.config')) {
+            $path = Join-Path $WebRoot $rel
+            if (-not (Test-Path -LiteralPath $path)) { continue }
+            $raw = [IO.File]::ReadAllText($path)
+            if ($raw.Contains($legacyHost)) {
+                $raw = $raw.Replace($legacyHost,$instance.PublicHost)
+                [IO.File]::WriteAllText($path,$raw,$utf8)
+            }
+            if ([IO.File]::ReadAllText($path).Contains($legacyHost)) {
+                throw "Legacy DDTank30 public host remains in ${path}: $legacyHost"
+            }
+        }
+    }
+}
+
 if ($ApplyRuntime) {
     $runtime = Join-Path $instance.Root 'runtime'
     Set-DDTank30ConfigSet -Root $runtime -RuntimeLayout
     $runtimeRequest = Join-Path $instance.Root 'webapps\Request\Web.config'
     if (Test-Path -LiteralPath $runtimeRequest) { Set-RequestWebConfig $runtimeRequest }
+    Set-DDTank30WebRoot (Join-Path $instance.Root 'webroot')
 }
 
 if ($ApplyDatabase) {
@@ -106,6 +223,18 @@ if ($ApplyIis) {
     }
     if (-not (Get-WebBinding -Name $site -Protocol http | Where-Object {$_.bindingInformation -eq $wanted})) {
         New-WebBinding -Name $site -Protocol http -IPAddress $instance.PublicHost -Port $instance.WebPort | Out-Null
+    }
+    $pool = 'DDTank30Pool'
+    foreach ($app in @(
+        @{ Name='Request'; Path=(Join-Path $instance.Root 'webapps\Request') },
+        @{ Name='gunny'; Path=(Join-Path $instance.Root 'webroot\gunny') },
+        @{ Name='Register'; Path=(Join-Path $instance.Root 'webroot\Register') },
+        @{ Name='admingunny'; Path=(Join-Path $instance.Root 'webroot\admingunny') }
+    )) {
+        if (-not (Test-Path -LiteralPath $app.Path)) { continue }
+        $existing = Get-WebApplication -Site $site | Where-Object { $_.Path -ieq ('/' + $app.Name) }
+        if ($existing) { Set-ItemProperty ("IIS:\Sites\$site\" + $app.Name) -Name applicationPool -Value $pool }
+        else { New-WebApplication -Site $site -Name $app.Name -PhysicalPath $app.Path -ApplicationPool $pool | Out-Null }
     }
 }
 

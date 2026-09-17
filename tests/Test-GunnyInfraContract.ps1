@@ -14,4 +14,6 @@ $inventory=Join-Path $root 'fleet.example.json'
 $out=& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $deploy -InventoryPath $inventory 2>&1 | Out-String
 if($LASTEXITCODE-ne0){throw "Fleet dry-run exited ${LASTEXITCODE}:`n$out"}
 if($out -notmatch 'FLEET_SYNC_VALIDATE_ONLY=PASS nodes=3' -or $out -notmatch 'FLEET_APPLY_VALIDATE_ONLY=PASS nodes=3' -or $out -notmatch 'GUNNY_FLEET_VALIDATE_ONLY=PASS'){throw "Fleet dry-run contract failed:`n$out"}
-Write-Host 'GUNNY_INFRA_CONTRACT=PASS'
+$dd30Apply=Get-Content (Join-Path $root 'lib\Apply-DDTank30Instance.ps1') -Raw
+foreach($token in @('webroot','Register','admingunny','DDTank30Pool','Get-DDTank30LegacyWebHost')){if($dd30Apply -notmatch [regex]::Escape($token)){throw "DDTank30 bundled apply missing webroot parity token: $token"}}
+if($dd30Apply -match '(?<!\d)103\.9\.156\.(181|182)(?!\d)'){throw 'DDTank30 bundled apply hard-codes a production IP'}Write-Host 'GUNNY_INFRA_CONTRACT=PASS'
