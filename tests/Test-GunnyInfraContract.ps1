@@ -4,7 +4,7 @@ $required=@('AGENTS.md','Apply-AllGunnyInstances.ps1','Set-GunnyPublicHost.ps1',
 foreach($rel in $required){if(-not(Test-Path (Join-Path $root $rel))){throw "Missing infra artifact: $rel"}}
 foreach($f in Get-ChildItem $root -File -Recurse -Filter '*.ps1'){$t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseFile($f.FullName,[ref]$t,[ref]$e);if($e.Count){throw "PowerShell syntax error in $($f.FullName): $($e[0].Message)"}}
 $agentPolicy=Get-Content (Join-Path $root 'AGENTS.md') -Raw
-foreach($token in @('server-instance.json','publicHost','Set-GunnyPublicHost.ps1','Do not','DESKTOP-603JII9')){if($agentPolicy -notmatch [regex]::Escape($token)){throw "Agent policy must pin server-instance.json publicHost ownership and canonical apply path; missing: $token"}}
+foreach($token in @('server-instance.json','publicHost','Set-GunnyPublicHost.ps1','Do not','DESKTOP-603JII9','continue all','unrelated projects')){if($agentPolicy -notmatch [regex]::Escape($token)){throw "Agent policy must pin server-instance.json publicHost ownership and canonical apply path; missing: $token"}}
 if($agentPolicy -match '(?<!\\d)103\\.9\\.156\\.(181|182)(?!\\d)'){throw 'Agent policy must not hard-code the current/legacy production IP; the manifest is authoritative'}
 $active=@('Apply-AllGunnyInstances.ps1','Set-GunnyPublicHost.ps1','Sync-GunnyInfraFleet.ps1','Invoke-GunnyFleet.ps1','Deploy-GunnyFleet.ps1')
 foreach($rel in $active){$raw=Get-Content (Join-Path $root $rel)-Raw;if($raw -match '_recover'){throw "$rel depends on a recovery worktree"};if($raw -match '(?<!\d)103\.9\.156\.(181|182)(?!\d)'){throw "$rel hard-codes a production IP"}}
