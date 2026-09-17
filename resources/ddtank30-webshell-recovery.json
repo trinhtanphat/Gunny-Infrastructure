@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "family": "DDTank-3.0",
+  "bundle": "webshell-static-recovery",
+  "authoritativeCommit": "16e24b119f96b93b34ddb148f9a035f71a234e67",
+  "assets": [
+    {"requestPath":"/favicon.ico","target":"favicon.ico","sourceKind":"authoritative-v30","source":"gunny\\favicon.ico","size":1150,"sha256":"1B3889C64370DE65F102B9A7740214755C6AE7BD53B107BBA2A152737847315F","confidence":"high"},
+    {"requestPath":"/gunny/scripts/images/number.gif","target":"gunny\\scripts\\images\\number.gif","sourceKind":"authoritative-v30","source":"gunny\\images\\number.gif","size":609,"sha256":"63943F680C7E2659E0F742A4096D04ECB74CAA30B37CABF9CFC03B7F771C98C8","confidence":"high"},
+    {"requestPath":"/gunny/scripts/images/bg-news.jpg","target":"gunny\\scripts\\images\\bg-news.jpg","sourceKind":"authoritative-v30","source":"gunny\\images\\bg-news.jpg","size":11499,"sha256":"4A8FC92915D43CED642C1B4AE1489E55819CBF07BAEA002F01B8893F7737FDD5","confidence":"high"},
+    {"requestPath":"/gunny/scripts/images/titleh2.jpg","target":"gunny\\scripts\\images\\titleh2.jpg","sourceKind":"authoritative-v30","source":"gunny\\images\\titleh2.jpg","size":4161,"sha256":"AC7AB18F33E70096641B93A6A111AA3C9B0F440D29C84FCE42427AFEC11F1961","confidence":"high"},
+    {"requestPath":"/gunny/scripts/images/icon.gif","target":"gunny\\scripts\\images\\icon.gif","sourceKind":"authoritative-v30","source":"gunny\\images\\icon.gif","size":46,"sha256":"97269557452DDE18019D736E6534AE2AE524554DFC7765D5DDE4D42CB336B8B4","confidence":"high"},
+    {"requestPath":"/images/loadingAnimation.gif","target":"images\\loadingAnimation.gif","sourceKind":"authoritative-v30","source":"admingunny\\Images\\loadingAnimation.gif","size":5886,"sha256":"E69ABD7E0CC82F336E61FEA889E406ECBBEB7ECE1DF960231B7A9BA0D1DD1676","confidence":"high"},
+    {"requestPath":"/lib/ga.js","target":"lib\\ga.js","sourceKind":"authoritative-v30","source":"gunny\\scripts\\ga.js","size":30662,"sha256":"837307EF8C36D02A3AB74D0C3E9285C680F02FC9F1F9754086B7FD37F9E647FE","confidence":"high"},
+    {"requestPath":"/gunny/scripts/popup/prototype.js","target":"gunny\\scripts\\popup\\prototype.js","sourceKind":"legacy-pinned","source":"gunny\\script\\prototype.js","size":153702,"sha256":"B46E698F24F5477867079E311BD4C177DC0CE30EFAD5097F5A3F7398F9B41692","confidence":"medium-high"},
+    {"requestPath":"/gunny/scripts/popup/script/popup.js","target":"gunny\\scripts\\popup\\script\\popup.js","sourceKind":"legacy-pinned","source":"gunny\\script\\popup.js","size":3104,"sha256":"751BF22C5F786F26A128201049142A9176FA863674A7A542B7CD1C098C0C564B","confidence":"medium-high"}
+  ],
+  "unresolved": [
+    {"requestPath":"/gunny/images/loop.jpg","reason":"Referenced by DDTank 3.0 CSS but absent from the authoritative 3.0 snapshot and the pinned legacy bundle; do not fabricate."},
+    {"requestPath":"/config.xml","reason":"Observed only from operator probes after /gunny/config.xml was healthy; do not create a root alias without a real client request."}
+  ]
+}
