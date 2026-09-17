@@ -23,4 +23,17 @@ if($recovery.schemaVersion-ne1 -or $recovery.family-ne'DDTank-3.0'){throw 'DDTan
 if(@($recovery.assets).Count-ne9){throw "DDTank30 recovery asset count mismatch: $(@($recovery.assets).Count)"}
 foreach($a in $recovery.assets){if([string]$a.sha256 -notmatch '^[0-9A-F]{64}$'){throw "Invalid recovery SHA256: $($a.requestPath)"};if([int64]$a.size-le0){throw "Invalid recovery size: $($a.requestPath)"}}
 if(@($recovery.unresolved).requestPath -notcontains '/gunny/images/loop.jpg'){throw 'Recovery manifest must keep loop.jpg explicitly unresolved until an original source is found'}
+$resourceArtifacts=@(
+  'lib\Ensure-GunnyV389Resources.ps1','lib\Sync-GunnyV389MapAssets.ps1','lib\Sync-GunnyV389MapAudio.ps1','lib\Sync-GunnyV389RuffleRecovery.ps1',
+  'lib\v389-map-assets-manifest.tsv','lib\v389-map-audio-manifest.tsv','lib\v389-ruffle-recovery-manifest.tsv','resources\gunny-v389-residual-recovery.json'
+)
+foreach($rel in $resourceArtifacts){if(-not(Test-Path (Join-Path $root $rel))){throw "Missing v389 resource artifact: $rel"}}
+$syncRaw=Get-Content (Join-Path $root 'Sync-GunnyInfraFleet.ps1') -Raw
+if($syncRaw -notmatch "'resources'"){throw 'Fleet sync must bundle resources directory.'}
+$applyRaw=Get-Content (Join-Path $root 'Apply-AllGunnyInstances.ps1') -Raw
+if($applyRaw -notmatch 'Ensure-GunnyV389Resources'){throw 'Apply-All must run the v389 resource guard.'}
+$guardRaw=Get-Content (Join-Path $root 'lib\Ensure-GunnyV389Resources.ps1') -Raw
+foreach($token in @('runtime-v389-map-assets-20260917','runtime-v389-map-audio-20260917','runtime-v389-ruffle-recovery-assets-20260917','gunny-v389-residual-recovery.json')){if($guardRaw -notmatch [regex]::Escape($token)){throw "v389 resource guard missing pinned token: $token"}}
+$expectedCounts=@{'v389-map-assets-manifest.tsv'=1719;'v389-map-audio-manifest.tsv'=179;'v389-ruffle-recovery-manifest.tsv'=398}
+foreach($name in $expectedCounts.Keys){$rows=@(Import-Csv (Join-Path $root ('lib\'+$name)) -Delimiter "`t");if($rows.Count-ne$expectedCounts[$name]){throw "$name row count mismatch: $($rows.Count)"};foreach($row in $rows){if([string]$row.sha256 -notmatch '^[0-9A-F]{64}$' -or [int64]$row.bytes-le0){throw "Invalid resource manifest row in ${name}: $($row.path)"}}}
 Write-Host 'GUNNY_INFRA_CONTRACT=PASS'

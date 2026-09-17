@@ -56,7 +56,8 @@ if($localIps -notcontains $publicHost){throw "publicHost $publicHost is not assi
 $vRoot=[string]$v.root;$dRoot=[string]$d.root
 $vApply=Join-Path $PSScriptRoot 'lib\Apply-GunnyV389Instance.ps1'
 $dApply=Join-Path $PSScriptRoot 'lib\Apply-DDTank30Instance.ps1'
-foreach($tool in @($vApply,$dApply)){if(-not(Test-Path -LiteralPath $tool)){throw "Apply tool missing: $tool"}}
+$vResourceGuard=Join-Path $PSScriptRoot 'lib\Ensure-GunnyV389Resources.ps1'
+foreach($tool in @($vApply,$dApply,$vResourceGuard)){if(-not(Test-Path -LiteralPath $tool)){throw "Apply tool missing: $tool"}}
 $vWeb=Join-Path $vRoot 'gunny\Web.config'
 $dRoad=Join-Path $dRoot 'runtime\game\Road.Service.exe.config'
 $oldV=Read-AppSetting $vWeb 'ActiveIP';$oldD=Read-AppSetting $dRoad 'IP'
@@ -82,6 +83,9 @@ $snapshot=[ordered]@{timestamp=(Get-Date).ToString('o');publicHost=$publicHost;o
 [IO.File]::WriteAllText((Join-Path $backupRoot 'snapshot.json'),($snapshot|ConvertTo-Json -Depth 8),(New-Object Text.UTF8Encoding($false)))
 [IO.File]::WriteAllText((Join-Path $PSScriptRoot 'last-backup.txt'),$backupRoot,(New-Object Text.UTF8Encoding($false)))
 Write-Host "BACKUP_READY=$backupRoot"
+
+$resourceHttpBase=if($SkipHttpProbe){''}else{"http://$publicHost"}
+& $vResourceGuard -TargetRoot $vRoot -Apply -HttpBaseUrl $resourceHttpBase -SkipHttpProbe:$SkipHttpProbe
 
 & $vApply -ConfigPath $ConfigPath -TargetRoot $vRoot -ApplyDatabase -ApplyIis
 & $dApply -ConfigPath $ConfigPath -RepoRoot (Join-Path $dRoot 'repo') -SkipSourceConfig -ApplyRuntime -ApplyDatabase -ApplyIis
