@@ -14,7 +14,8 @@ if (-not (Test-Path -LiteralPath $webRoot -PathType Container)) { throw "Gunny w
 $sets = @(
     [pscustomobject]@{Name='map';Manifest=(Join-Path $ManifestRoot 'v389-map-assets-manifest.tsv');Package='gunny-v389-map-assets-20260917.zip';Uri='https://github.com/trinhtanphat/Resource/releases/download/runtime-v389-map-assets-20260917/gunny-v389-map-assets-20260917.zip';Sha='2788692DD5315DE5DCDFF7166FFB4F50462A07E1BD450A2D491326760D6FFECD';Script=(Join-Path $PSScriptRoot 'Sync-GunnyV389MapAssets.ps1')},
     [pscustomobject]@{Name='audio';Manifest=(Join-Path $ManifestRoot 'v389-map-audio-manifest.tsv');Package='gunny-v389-map-audio-20260917.zip';Uri='https://github.com/trinhtanphat/Resource/releases/download/runtime-v389-map-audio-20260917/gunny-v389-map-audio-20260917.zip';Sha='B0D5BDE9B741273AD2A66777D81DDFB4C0C9F932AF2ABB3436AD54EEE44529AB';Script=(Join-Path $PSScriptRoot 'Sync-GunnyV389MapAudio.ps1')},
-    [pscustomobject]@{Name='recovery';Manifest=(Join-Path $ManifestRoot 'v389-ruffle-recovery-manifest.tsv');Package='gunny-v389-ruffle-recovery-assets-20260917.zip';Uri='https://github.com/trinhtanphat/Resource/releases/download/runtime-v389-ruffle-recovery-assets-20260917/gunny-v389-ruffle-recovery-assets-20260917.zip';Sha='769D059405E7C42463B9681CBAAD990C8292C4C56E2D2FBE34BB1FEA96F244C4';Script=(Join-Path $PSScriptRoot 'Sync-GunnyV389RuffleRecovery.ps1')}
+    [pscustomobject]@{Name='recovery';Manifest=(Join-Path $ManifestRoot 'v389-ruffle-recovery-manifest.tsv');Package='gunny-v389-ruffle-recovery-assets-20260917.zip';Uri='https://github.com/trinhtanphat/Resource/releases/download/runtime-v389-ruffle-recovery-assets-20260917/gunny-v389-ruffle-recovery-assets-20260917.zip';Sha='769D059405E7C42463B9681CBAAD990C8292C4C56E2D2FBE34BB1FEA96F244C4';Script=(Join-Path $PSScriptRoot 'Sync-GunnyV389RuffleRecovery.ps1')},
+    [pscustomobject]@{Name='farm';Manifest=(Join-Path $ManifestRoot 'v389-farm-pet-manifest.tsv');SourceRef='43c21f53343cef61cf91180438bf594b2c8bd51b';Script=(Join-Path $PSScriptRoot 'Sync-GunnyV389FarmAssets.ps1')}
 )
 function Test-ResourceSet($Set) {
     if (-not (Test-Path -LiteralPath $Set.Manifest -PathType Leaf)) { throw "Resource manifest missing: $($Set.Manifest)" }
@@ -63,6 +64,10 @@ if ($bad.Count -gt 0) {
     if (-not $Apply) { throw "Gunny v389 resource drift detected: $(@($bad.Name) -join ', '). Re-run with -Apply to self-heal from pinned releases." }
     foreach ($a in $bad) {
         $set = @($sets | Where-Object { $_.Name -eq $a.Name })[0]
+        if ($set.Name -eq 'farm') {
+            & $set.Script -TargetRoot $TargetRoot -ManifestPath $set.Manifest -SourceRef $set.SourceRef
+            continue
+        }
         $packagePath = Get-VerifiedPackage $set
         switch ($set.Name) {
             'map' { & $set.Script -TargetRoot $TargetRoot -PackagePath $packagePath -ExpectedSha256 $set.Sha -ExpectedMapDirs 378 -ExpectedFiles 1719 }
