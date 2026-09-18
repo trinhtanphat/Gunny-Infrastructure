@@ -22,7 +22,9 @@ try {
     } else {
       $source=Join-Path $tempRoot ([string]$asset.source).Replace('/','\')
       New-Item -ItemType Directory -Force -Path (Split-Path $source) | Out-Null
-      $url="https://raw.githubusercontent.com/$($manifest.sourceRepo)/$($manifest.sourceRef)/$($asset.source)"
+      $sourceRepo=if($asset.PSObject.Properties.Name -contains 'sourceRepo' -and $asset.sourceRepo){[string]$asset.sourceRepo}else{[string]$manifest.sourceRepo}
+      $sourceRef=if($asset.PSObject.Properties.Name -contains 'sourceRef' -and $asset.sourceRef){[string]$asset.sourceRef}else{[string]$manifest.sourceRef}
+      $url="https://raw.githubusercontent.com/$sourceRepo/$sourceRef/$($asset.source)"
       Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $source -TimeoutSec 30
     }
     if(-not(Test-Path -LiteralPath $source)){throw "Missing source for $($asset.requestPath): $source"}

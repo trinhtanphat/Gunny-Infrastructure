@@ -3,8 +3,8 @@ param(
     [string]$TargetRoot = 'C:\Gunny\GunnyFileExe',
     [string]$ReleaseZipUri = 'https://github.com/trinhtanphat/Resource/releases/download/runtime-v389-ruffle-recovery-assets-20260917/gunny-v389-ruffle-recovery-assets-20260917.zip',
     [string]$PackagePath = '',
-    [string]$ExpectedSha256 = '769D059405E7C42463B9681CBAAD990C8292C4C56E2D2FBE34BB1FEA96F244C4',
-    [int]$ExpectedFiles = 398,
+    [string]$ExpectedSha256 = '8C0DF2BE3D8ECBE8F26944621D1DEF0FD787DC52CC833A372C79E902E6C08382',
+    [int]$ExpectedFiles = 453,
     [string]$WorkRoot = '',
     [switch]$SkipBackup
 )

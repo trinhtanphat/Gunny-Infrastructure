@@ -58,7 +58,8 @@ $vApply=Join-Path $PSScriptRoot 'lib\Apply-GunnyV389Instance.ps1'
 $dApply=Join-Path $PSScriptRoot 'lib\Apply-DDTank30Instance.ps1'
 $vResourceGuard=Join-Path $PSScriptRoot 'lib\Ensure-GunnyV389Resources.ps1'
 $httpsGuard=Join-Path $PSScriptRoot 'lib\Ensure-GunnyAdminHttps.ps1'
-foreach($tool in @($vApply,$dApply,$vResourceGuard,$httpsGuard)){if(-not(Test-Path -LiteralPath $tool)){throw "Apply tool missing: $tool"}}
+$adminStaticGuard=Join-Path $PSScriptRoot 'lib\Ensure-GunnyAdminStaticAliases.ps1'
+foreach($tool in @($vApply,$dApply,$vResourceGuard,$httpsGuard,$adminStaticGuard)){if(-not(Test-Path -LiteralPath $tool)){throw "Apply tool missing: $tool"}}
 $vWeb=Join-Path $vRoot 'gunny\Web.config'
 $dRoad=Join-Path $dRoot 'runtime\game\Road.Service.exe.config'
 $oldV=Read-AppSetting $vWeb 'ActiveIP';$oldD=Read-AppSetting $dRoad 'IP'
@@ -91,6 +92,8 @@ $resourceHttpBase=if($SkipHttpProbe){''}else{"http://$publicHost"}
 & $vApply -ConfigPath $ConfigPath -TargetRoot $vRoot -ApplyDatabase -ApplyIis
 & $dApply -ConfigPath $ConfigPath -RepoRoot (Join-Path $dRoot 'repo') -SkipSourceConfig -ApplyRuntime -ApplyDatabase -ApplyIis
 & $httpsGuard -PublicHost $publicHost -SiteName ([string]$v.webSite)
+$adminStaticProbeBase=if($SkipHttpProbe){''}else{"https://$publicHost"}
+& $adminStaticGuard -AdminRoot (Join-Path $vRoot 'AdminGunny') -SiteName ([string]$v.webSite) -ProbeBaseUrl $adminStaticProbeBase
 
 if($vChanged -and $RestartChangedStacks){
     $restart=Join-Path $vRoot 'ops\Start-GunnyServer.ps1'

@@ -1,6 +1,6 @@
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
-$required=@('AGENTS.md','Apply-AllGunnyInstances.ps1','Set-GunnyPublicHost.ps1','Sync-GunnyInfraFleet.ps1','Invoke-GunnyFleet.ps1','Deploy-GunnyFleet.ps1','server-instance.example.json','fleet.example.json','lib\Apply-GunnyV389Instance.ps1','lib\Get-GunnyV389Instance.ps1','lib\Apply-DDTank30Instance.ps1','lib\Get-DDTank30Instance.ps1','lib\Stop-DDTank30Supervisor.ps1','lib\Ensure-GunnyAdminHttps.ps1')
+$required=@('AGENTS.md','Apply-AllGunnyInstances.ps1','Set-GunnyPublicHost.ps1','Sync-GunnyInfraFleet.ps1','Invoke-GunnyFleet.ps1','Deploy-GunnyFleet.ps1','server-instance.example.json','fleet.example.json','lib\Apply-GunnyV389Instance.ps1','lib\Get-GunnyV389Instance.ps1','lib\Apply-DDTank30Instance.ps1','lib\Get-DDTank30Instance.ps1','lib\Stop-DDTank30Supervisor.ps1','lib\Ensure-GunnyAdminHttps.ps1','lib\Ensure-GunnyAdminStaticAliases.ps1')
 foreach($rel in $required){if(-not(Test-Path (Join-Path $root $rel))){throw "Missing infra artifact: $rel"}}
 foreach($f in Get-ChildItem $root -File -Recurse -Filter '*.ps1'){$t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseFile($f.FullName,[ref]$t,[ref]$e);if($e.Count){throw "PowerShell syntax error in $($f.FullName): $($e[0].Message)"}}
 $agentPolicy=Get-Content (Join-Path $root 'AGENTS.md') -Raw
@@ -36,12 +36,23 @@ if($syncRaw -notmatch "'resources'"){throw 'Fleet sync must bundle resources dir
 $applyRaw=Get-Content (Join-Path $root 'Apply-AllGunnyInstances.ps1') -Raw
 if($applyRaw -notmatch 'Ensure-GunnyV389Resources'){throw 'Apply-All must run the v389 resource guard.'}
 if($applyRaw -notmatch 'Ensure-GunnyAdminHttps'){throw 'Apply-All must run the AdminGunny HTTPS guard.'}
+if($applyRaw -notmatch 'Ensure-GunnyAdminStaticAliases'){throw 'Apply-All must run the AdminGunny static alias guard.'}
+$adminStaticRaw=Get-Content (Join-Path $root 'lib\Ensure-GunnyAdminStaticAliases.ps1') -Raw
+foreach($token in @('New-WebVirtualDirectory','Scripts','Images','AdminGunny')){if($adminStaticRaw -notmatch [regex]::Escape($token)){throw "AdminGunny static alias guard missing token: $token"}}
+if($adminStaticRaw -match '(?<!\d)103\.9\.156\.(181|182)(?!\d)'){throw 'AdminGunny static alias guard hard-codes a production IP'}
 $httpsRaw=Get-Content (Join-Path $root 'lib\Ensure-GunnyAdminHttps.ps1') -Raw
 foreach($token in @('New-SelfSignedCertificate','AddSslCertificate','AdminGunny','Export-Certificate','LocalMachine\Root')){if($httpsRaw -notmatch [regex]::Escape($token)){throw "AdminGunny HTTPS guard missing token: $token"}}
 if($httpsRaw -match '(?<!\d)103\.9\.156\.(181|182)(?!\d)'){throw 'AdminGunny HTTPS guard hard-codes a production IP'}
+$restoreResidualRaw=Get-Content (Join-Path $root 'lib\Restore-GunnyV389ResidualAssets.ps1') -Raw
+foreach($token in @('sourceRepo','sourceRef','raw.githubusercontent.com')){if($restoreResidualRaw -notmatch [regex]::Escape($token)){throw "Residual restore multi-source support missing token: $token"}}
+$residualManifest=Get-Content (Join-Path $root 'resources\gunny-v389-residual-recovery.json') -Raw | ConvertFrom-Json
+if(@($residualManifest.assets).Count-ne22){throw "Residual recovery asset count mismatch: $(@($residualManifest.assets).Count)"}
+foreach($asset in @($residualManifest.assets)){if([string]$asset.sha256 -notmatch '^[0-9A-F]{64}$' -or [int64]$asset.size-le0){throw "Invalid residual asset: $($asset.requestPath)"}}
+$requiredResidualPaths=@('/gunny/image/equip/f/suits/suits16/icon_1.png','/gunny/image/equip/recover/recover3/icon.png','/gunny/image/unfrightprop/juniorboomerang/icon.png','/gunny/image/arm/sssword2/1/icon.png','/gunny/image/worldboss/1/cloth/f/cloth/1.png','/gunny/image/worldboss/1/cloth/f/clothf/1.png')
+foreach($requestPath in $requiredResidualPaths){if(@($residualManifest.assets).requestPath -notcontains $requestPath){throw "Residual recovery missing observed path: $requestPath"}}
 $guardRaw=Get-Content (Join-Path $root 'lib\Ensure-GunnyV389Resources.ps1') -Raw
-foreach($token in @('runtime-v389-map-assets-20260917','runtime-v389-map-audio-20260917','runtime-v389-ruffle-recovery-assets-20260917','gunny-v389-residual-recovery.json','43c21f53343cef61cf91180438bf594b2c8bd51b','303eab6ab6c17cc7ed6cd11bd8bab3331970cd6e')){if($guardRaw -notmatch [regex]::Escape($token)){throw "v389 resource guard missing pinned token: $token"}}
-$expectedCounts=@{'v389-map-assets-manifest.tsv'=1719;'v389-map-audio-manifest.tsv'=179;'v389-ruffle-recovery-manifest.tsv'=398;'v389-farm-pet-manifest.tsv'=223;'v389-observed-ruffle-manifest.tsv'=178}
+foreach($token in @('runtime-v389-map-assets-20260917','runtime-v389-map-audio-20260917','runtime-v389-ruffle-recovery-assets-20260917','8C0DF2BE3D8ECBE8F26944621D1DEF0FD787DC52CC833A372C79E902E6C08382','gunny-v389-residual-recovery.json','43c21f53343cef61cf91180438bf594b2c8bd51b','303eab6ab6c17cc7ed6cd11bd8bab3331970cd6e')){if($guardRaw -notmatch [regex]::Escape($token)){throw "v389 resource guard missing pinned token: $token"}}
+$expectedCounts=@{'v389-map-assets-manifest.tsv'=1719;'v389-map-audio-manifest.tsv'=179;'v389-ruffle-recovery-manifest.tsv'=453;'v389-farm-pet-manifest.tsv'=223;'v389-observed-ruffle-manifest.tsv'=178}
 foreach($name in $expectedCounts.Keys){$rows=@(Import-Csv (Join-Path $root ('lib\'+$name)) -Delimiter "`t");if($rows.Count-ne$expectedCounts[$name]){throw "$name row count mismatch: $($rows.Count)"};foreach($row in $rows){if([string]$row.sha256 -notmatch '^[0-9A-F]{64}$' -or [int64]$row.bytes-le0){throw "Invalid resource manifest row in ${name}: $($row.path)"}}}
 $observedRows=@(Import-Csv (Join-Path $root 'lib\v389-observed-ruffle-manifest.tsv') -Delimiter "`t")
 if(@($observedRows|Where-Object sourceMode -eq 'embedded').Count-ne1){throw 'Observed manifest embedded-source count mismatch'}

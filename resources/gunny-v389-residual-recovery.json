@@ -1,20 +1,213 @@
 {
   "schemaVersion": 1,
   "family": "Gunny-v389/5-year",
-  "bundle": "residual-static-recovery-20260917",
+  "bundle": "residual-static-recovery-20260918",
   "sourceRepo": "trinhtanphat/Resource38",
   "sourceRef": "d88916533679b7fa59b893395439e84e104ac87b",
   "assets": [
-    {"requestPath":"/gunny/image/unfrightprop/san1/icon.png","target":"image\\unfrightprop\\san1\\icon.png","source":"image/unfrightprop/san1/icon.png","size":3272,"sha256":"9CAA245BE8D876CD9BAE9BF35EF647C91629ABBFC441D4B9F51D4F1B71F438F3","confidence":"high"},
-    {"requestPath":"/gunny/image/unfrightprop/yuan1/icon.png","target":"image\\unfrightprop\\yuan1\\icon.png","source":"image/unfrightprop/yuan1/icon.png","size":3388,"sha256":"567C25BB1EB76AF39F8E5911C0F845282808412296BB05BF5F8C63B9C0554D84","confidence":"high"},
-    {"requestPath":"/gunny/image/unfrightprop/ssan1/icon.png","target":"image\\unfrightprop\\ssan1\\icon.png","source":"image/unfrightprop/ssan1/icon.png","size":4600,"sha256":"76ADDFAC323B1BCD6D7426848F815699CF7A1DA0F528059D478E2FB6F8487837","confidence":"high"},
-    {"requestPath":"/gunny/image/unfrightprop/package5/icon.png","target":"image\\unfrightprop\\package5\\icon.png","source":"image/unfrightprop/package5/icon.png","size":4616,"sha256":"7875D91FD37D886D2D1C1865D45B0B7529DFD171B2C622E10530BE417D513274","confidence":"high"},
-    {"requestPath":"/gunny/image/equip/f/cloth/cloth76/2/show.png","target":"image\\equip\\f\\cloth\\cloth76\\2\\show.png","source":"image/equip/f/cloth/cloth76/2/show.png","size":1804,"sha256":"0F7ABECB4FE85557F931D40A575C2407D378786C5047B4FA7E4A1C8C07D0665B","confidence":"high"},
-    {"requestPath":"/gunny/image/equip/f/cloth/cloth76/3/show.png","target":"image\\equip\\f\\cloth\\cloth76\\3\\show.png","source":"image/equip/f/cloth/cloth76/3/show.png","size":2143,"sha256":"446DE9526A2AB9C506C63202097F49F3B879B506C61DDF30284EFF3856348228","confidence":"high"},
-    {"requestPath":"/gunny/image/equip/f/cloth/cloth76/1/show.png","target":"image\\equip\\f\\cloth\\cloth76\\1\\show.png","source":"image/equip/f/cloth/cloth76/1/show.png","size":6808,"sha256":"9515C4FDC10E6DEF131D91DBC51811B3D6E5519AFAADCAC93989AE3598A5D0E3","confidence":"high"},
-    {"requestPath":"/gunny/image/unfrightprop/brightcolorspar/icon.png","target":"image\\unfrightprop\\brightcolorspar\\icon.png","source":"image/unfrightprop/brightcolorspar/icon.png","size":4686,"sha256":"066D3CE4D8032A4F07DDAB4862445D870E23FDFB6C23E48914E3C93246D001E4","confidence":"high"},
-    {"requestPath":"/gunny/image/arm/ghostaxe/1/icon.png","target":"image\\arm\\ghostaxe\\1\\icon.png","source":"image/arm/ghostaxe/1/icon.png","size":4129,"sha256":"D8CAA7D6807E2EE8F8C9EBB827ED2AA8B6BB78DFCC263799EBE1350FC64D559D","confidence":"high"}
+    {
+      "requestPath": "/gunny/image/unfrightprop/san1/icon.png",
+      "target": "image\\unfrightprop\\san1\\icon.png",
+      "source": "image/unfrightprop/san1/icon.png",
+      "size": 3272,
+      "sha256": "9CAA245BE8D876CD9BAE9BF35EF647C91629ABBFC441D4B9F51D4F1B71F438F3",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/unfrightprop/yuan1/icon.png",
+      "target": "image\\unfrightprop\\yuan1\\icon.png",
+      "source": "image/unfrightprop/yuan1/icon.png",
+      "size": 3388,
+      "sha256": "567C25BB1EB76AF39F8E5911C0F845282808412296BB05BF5F8C63B9C0554D84",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/unfrightprop/ssan1/icon.png",
+      "target": "image\\unfrightprop\\ssan1\\icon.png",
+      "source": "image/unfrightprop/ssan1/icon.png",
+      "size": 4600,
+      "sha256": "76ADDFAC323B1BCD6D7426848F815699CF7A1DA0F528059D478E2FB6F8487837",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/unfrightprop/package5/icon.png",
+      "target": "image\\unfrightprop\\package5\\icon.png",
+      "source": "image/unfrightprop/package5/icon.png",
+      "size": 4616,
+      "sha256": "7875D91FD37D886D2D1C1865D45B0B7529DFD171B2C622E10530BE417D513274",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/equip/f/cloth/cloth76/2/show.png",
+      "target": "image\\equip\\f\\cloth\\cloth76\\2\\show.png",
+      "source": "image/equip/f/cloth/cloth76/2/show.png",
+      "size": 1804,
+      "sha256": "0F7ABECB4FE85557F931D40A575C2407D378786C5047B4FA7E4A1C8C07D0665B",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/equip/f/cloth/cloth76/3/show.png",
+      "target": "image\\equip\\f\\cloth\\cloth76\\3\\show.png",
+      "source": "image/equip/f/cloth/cloth76/3/show.png",
+      "size": 2143,
+      "sha256": "446DE9526A2AB9C506C63202097F49F3B879B506C61DDF30284EFF3856348228",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/equip/f/cloth/cloth76/1/show.png",
+      "target": "image\\equip\\f\\cloth\\cloth76\\1\\show.png",
+      "source": "image/equip/f/cloth/cloth76/1/show.png",
+      "size": 6808,
+      "sha256": "9515C4FDC10E6DEF131D91DBC51811B3D6E5519AFAADCAC93989AE3598A5D0E3",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/unfrightprop/brightcolorspar/icon.png",
+      "target": "image\\unfrightprop\\brightcolorspar\\icon.png",
+      "source": "image/unfrightprop/brightcolorspar/icon.png",
+      "size": 4686,
+      "sha256": "066D3CE4D8032A4F07DDAB4862445D870E23FDFB6C23E48914E3C93246D001E4",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/arm/ghostaxe/1/icon.png",
+      "target": "image\\arm\\ghostaxe\\1\\icon.png",
+      "source": "image/arm/ghostaxe/1/icon.png",
+      "size": 4129,
+      "sha256": "D8CAA7D6807E2EE8F8C9EBB827ED2AA8B6BB78DFCC263799EBE1350FC64D559D",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/equip/f/suits/suits16/icon_1.png",
+      "target": "image\\equip\\f\\suits\\suits16\\icon_1.png",
+      "source": "UnityClient/Assets/StreamingAssets/PcData/Resource/image/equip/f/suits/suits16/icon_1.png",
+      "sourceRepo": "thanhtinz/Gun_mobile",
+      "sourceRef": "27d8525f4e485e291d10553fd8096de69ddeb869",
+      "size": 5131,
+      "sha256": "2289FACBCE6B27BB3BB072471C2E229E13D258FD3B5605F2588784386AA04C71",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/unfrightprop/juniorboomerang/icon.png",
+      "target": "image\\unfrightprop\\juniorboomerang\\icon.png",
+      "source": "UnityClient/Assets/StreamingAssets/PcData/Resource/image/unfrightprop/juniorboomerang/icon.png",
+      "sourceRepo": "thanhtinz/Gun_mobile",
+      "sourceRef": "27d8525f4e485e291d10553fd8096de69ddeb869",
+      "size": 3026,
+      "sha256": "3166FE4D87670ED4C33DE3327A6F6138135AF48FB1E72AA93763360386966EAB",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/equip/recover/recover3/icon.png",
+      "target": "image\\equip\\recover\\recover3\\icon.png",
+      "source": "UnityClient/Assets/StreamingAssets/PcData/Resource/image/prop/recover3/icon.png",
+      "sourceRepo": "thanhtinz/Gun_mobile",
+      "sourceRef": "27d8525f4e485e291d10553fd8096de69ddeb869",
+      "size": 3953,
+      "sha256": "40C249C125C9EDB461F11AFF01CF12724C390BAD5BA93720EFD51D0C81AA0589",
+      "confidence": "high-compat-alias"
+    },
+    {
+      "requestPath": "/gunny/image/arm/sssword2/1/icon.png",
+      "target": "image\\arm\\sssword2\\1\\icon.png",
+      "source": "UnityClient/Assets/StreamingAssets/PcData/Resource/image/arm/ssword/1/icon.png",
+      "sourceRepo": "thanhtinz/Gun_mobile",
+      "sourceRef": "27d8525f4e485e291d10553fd8096de69ddeb869",
+      "size": 4384,
+      "sha256": "CDA71413800542F55F7AD7705801D3C3F51289D713F36863939F5982DA117F62",
+      "confidence": "high-compat-alias"
+    },
+    {
+      "requestPath": "/gunny/image/arm/sssword3/1/icon.png",
+      "target": "image\\arm\\sssword3\\1\\icon.png",
+      "source": "UnityClient/Assets/StreamingAssets/PcData/Resource/image/arm/ssword/1/icon.png",
+      "sourceRepo": "thanhtinz/Gun_mobile",
+      "sourceRef": "27d8525f4e485e291d10553fd8096de69ddeb869",
+      "size": 4384,
+      "sha256": "CDA71413800542F55F7AD7705801D3C3F51289D713F36863939F5982DA117F62",
+      "confidence": "high-compat-alias"
+    },
+    {
+      "requestPath": "/gunny/image/arm/sssword4/1/icon.png",
+      "target": "image\\arm\\sssword4\\1\\icon.png",
+      "source": "UnityClient/Assets/StreamingAssets/PcData/Resource/image/arm/ssword/1/icon.png",
+      "sourceRepo": "thanhtinz/Gun_mobile",
+      "sourceRef": "27d8525f4e485e291d10553fd8096de69ddeb869",
+      "size": 4384,
+      "sha256": "CDA71413800542F55F7AD7705801D3C3F51289D713F36863939F5982DA117F62",
+      "confidence": "high-compat-alias"
+    },
+    {
+      "requestPath": "/gunny/image/arm/sssword5/1/icon.png",
+      "target": "image\\arm\\sssword5\\1\\icon.png",
+      "source": "UnityClient/Assets/StreamingAssets/PcData/Resource/image/arm/ssword/1/icon.png",
+      "sourceRepo": "thanhtinz/Gun_mobile",
+      "sourceRef": "27d8525f4e485e291d10553fd8096de69ddeb869",
+      "size": 4384,
+      "sha256": "CDA71413800542F55F7AD7705801D3C3F51289D713F36863939F5982DA117F62",
+      "confidence": "high-compat-alias"
+    },
+    {
+      "requestPath": "/gunny/image/worldboss/1/cloth/f/cloth/1.png",
+      "target": "image\\worldboss\\1\\cloth\\f\\cloth\\1.png",
+      "source": "image/worldboss/1/cloth/f/cloth/1.png",
+      "sourceRepo": "trinhtanphat/Resource",
+      "sourceRef": "519c35a293745b6a0477c4f6ea03110a89de2318",
+      "size": 19621,
+      "sha256": "DFC83029255EEE75CB3584C47ED695533B3699979A600934ACF51D2DFB1F0788",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/worldboss/1/cloth/f/cloth/2.png",
+      "target": "image\\worldboss\\1\\cloth\\f\\cloth\\2.png",
+      "source": "image/worldboss/1/cloth/f/cloth/2.png",
+      "sourceRepo": "trinhtanphat/Resource",
+      "sourceRef": "519c35a293745b6a0477c4f6ea03110a89de2318",
+      "size": 223,
+      "sha256": "35C19C9037A8F608D61B227D4FF6DF51BE6731A46852B73F1140C5049A7B490C",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/worldboss/1/cloth/f/cloth/3.png",
+      "target": "image\\worldboss\\1\\cloth\\f\\cloth\\3.png",
+      "source": "image/worldboss/1/cloth/f/cloth/3.png",
+      "sourceRepo": "trinhtanphat/Resource",
+      "sourceRef": "519c35a293745b6a0477c4f6ea03110a89de2318",
+      "size": 223,
+      "sha256": "35C19C9037A8F608D61B227D4FF6DF51BE6731A46852B73F1140C5049A7B490C",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/worldboss/1/cloth/f/clothf/1.png",
+      "target": "image\\worldboss\\1\\cloth\\f\\clothf\\1.png",
+      "source": "image/worldboss/1/cloth/f/clothf/1.png",
+      "sourceRepo": "trinhtanphat/Resource",
+      "sourceRef": "519c35a293745b6a0477c4f6ea03110a89de2318",
+      "size": 19277,
+      "sha256": "C877B444FD20E275099506A8307AE0B30CFAF05F7E32C9F925F538E4C9B99BEC",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/worldboss/1/cloth/f/clothf/2.png",
+      "target": "image\\worldboss\\1\\cloth\\f\\clothf\\2.png",
+      "source": "image/worldboss/1/cloth/f/clothf/2.png",
+      "sourceRepo": "trinhtanphat/Resource",
+      "sourceRef": "519c35a293745b6a0477c4f6ea03110a89de2318",
+      "size": 223,
+      "sha256": "35C19C9037A8F608D61B227D4FF6DF51BE6731A46852B73F1140C5049A7B490C",
+      "confidence": "high"
+    },
+    {
+      "requestPath": "/gunny/image/worldboss/1/cloth/f/clothf/3.png",
+      "target": "image\\worldboss\\1\\cloth\\f\\clothf\\3.png",
+      "source": "image/worldboss/1/cloth/f/clothf/3.png",
+      "sourceRepo": "trinhtanphat/Resource",
+      "sourceRef": "519c35a293745b6a0477c4f6ea03110a89de2318",
+      "size": 223,
+      "sha256": "35C19C9037A8F608D61B227D4FF6DF51BE6731A46852B73F1140C5049A7B490C",
+      "confidence": "high"
+    }
   ],
-  "provenance": "All nine files matched byte-for-byte across local Resource38, Resource, and Resource-pnkl1999 copies before recovery; sourceRef pins the archived Resource38 state.",
-  "liveValidation": "Restored missing-only on 103.9.156.181 and verified HTTP 200 for all nine request paths on 2026-09-17; the final two were fresh Ruffle 404s brightcolorspar and ghostaxe."
+  "provenance": "Original nine assets remain pinned to Resource38. Added 2026-09-18 assets are pinned per-entry: Gun_mobile for suits16/juniorboomerang/recover3/SSsword icon compatibility, and trinhtanphat/Resource@519c35a for exact worldboss cloth source blobs verified by the r033 port manifest in trinhtanphat/Gunny. Every entry is size+SHA256 verified.",
+  "liveValidation": "All 22 manifest paths were validated/restored on 103.9.156.181; newly observed 2026-09-18 Ruffle 404 paths were HTTP 200 after recovery."
 }
