@@ -1,6 +1,6 @@
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
-$required=@('AGENTS.md','Apply-AllGunnyInstances.ps1','Set-GunnyPublicHost.ps1','Sync-GunnyInfraFleet.ps1','Invoke-GunnyFleet.ps1','Deploy-GunnyFleet.ps1','server-instance.example.json','fleet.example.json','lib\Apply-GunnyV389Instance.ps1','lib\Get-GunnyV389Instance.ps1','lib\Apply-DDTank30Instance.ps1','lib\Get-DDTank30Instance.ps1','lib\Stop-DDTank30Supervisor.ps1')
+$required=@('AGENTS.md','Apply-AllGunnyInstances.ps1','Set-GunnyPublicHost.ps1','Sync-GunnyInfraFleet.ps1','Invoke-GunnyFleet.ps1','Deploy-GunnyFleet.ps1','server-instance.example.json','fleet.example.json','lib\Apply-GunnyV389Instance.ps1','lib\Get-GunnyV389Instance.ps1','lib\Apply-DDTank30Instance.ps1','lib\Get-DDTank30Instance.ps1','lib\Stop-DDTank30Supervisor.ps1','lib\Ensure-GunnyAdminHttps.ps1')
 foreach($rel in $required){if(-not(Test-Path (Join-Path $root $rel))){throw "Missing infra artifact: $rel"}}
 foreach($f in Get-ChildItem $root -File -Recurse -Filter '*.ps1'){$t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseFile($f.FullName,[ref]$t,[ref]$e);if($e.Count){throw "PowerShell syntax error in $($f.FullName): $($e[0].Message)"}}
 $agentPolicy=Get-Content (Join-Path $root 'AGENTS.md') -Raw
@@ -35,6 +35,10 @@ $syncRaw=Get-Content (Join-Path $root 'Sync-GunnyInfraFleet.ps1') -Raw
 if($syncRaw -notmatch "'resources'"){throw 'Fleet sync must bundle resources directory.'}
 $applyRaw=Get-Content (Join-Path $root 'Apply-AllGunnyInstances.ps1') -Raw
 if($applyRaw -notmatch 'Ensure-GunnyV389Resources'){throw 'Apply-All must run the v389 resource guard.'}
+if($applyRaw -notmatch 'Ensure-GunnyAdminHttps'){throw 'Apply-All must run the AdminGunny HTTPS guard.'}
+$httpsRaw=Get-Content (Join-Path $root 'lib\Ensure-GunnyAdminHttps.ps1') -Raw
+foreach($token in @('New-SelfSignedCertificate','AddSslCertificate','AdminGunny','Export-Certificate','LocalMachine\Root')){if($httpsRaw -notmatch [regex]::Escape($token)){throw "AdminGunny HTTPS guard missing token: $token"}}
+if($httpsRaw -match '(?<!\d)103\.9\.156\.(181|182)(?!\d)'){throw 'AdminGunny HTTPS guard hard-codes a production IP'}
 $guardRaw=Get-Content (Join-Path $root 'lib\Ensure-GunnyV389Resources.ps1') -Raw
 foreach($token in @('runtime-v389-map-assets-20260917','runtime-v389-map-audio-20260917','runtime-v389-ruffle-recovery-assets-20260917','gunny-v389-residual-recovery.json','43c21f53343cef61cf91180438bf594b2c8bd51b','303eab6ab6c17cc7ed6cd11bd8bab3331970cd6e')){if($guardRaw -notmatch [regex]::Escape($token)){throw "v389 resource guard missing pinned token: $token"}}
 $expectedCounts=@{'v389-map-assets-manifest.tsv'=1719;'v389-map-audio-manifest.tsv'=179;'v389-ruffle-recovery-manifest.tsv'=398;'v389-farm-pet-manifest.tsv'=223;'v389-observed-ruffle-manifest.tsv'=178}

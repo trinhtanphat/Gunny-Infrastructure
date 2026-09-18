@@ -57,7 +57,8 @@ $vRoot=[string]$v.root;$dRoot=[string]$d.root
 $vApply=Join-Path $PSScriptRoot 'lib\Apply-GunnyV389Instance.ps1'
 $dApply=Join-Path $PSScriptRoot 'lib\Apply-DDTank30Instance.ps1'
 $vResourceGuard=Join-Path $PSScriptRoot 'lib\Ensure-GunnyV389Resources.ps1'
-foreach($tool in @($vApply,$dApply,$vResourceGuard)){if(-not(Test-Path -LiteralPath $tool)){throw "Apply tool missing: $tool"}}
+$httpsGuard=Join-Path $PSScriptRoot 'lib\Ensure-GunnyAdminHttps.ps1'
+foreach($tool in @($vApply,$dApply,$vResourceGuard,$httpsGuard)){if(-not(Test-Path -LiteralPath $tool)){throw "Apply tool missing: $tool"}}
 $vWeb=Join-Path $vRoot 'gunny\Web.config'
 $dRoad=Join-Path $dRoot 'runtime\game\Road.Service.exe.config'
 $oldV=Read-AppSetting $vWeb 'ActiveIP';$oldD=Read-AppSetting $dRoad 'IP'
@@ -89,6 +90,7 @@ $resourceHttpBase=if($SkipHttpProbe){''}else{"http://$publicHost"}
 
 & $vApply -ConfigPath $ConfigPath -TargetRoot $vRoot -ApplyDatabase -ApplyIis
 & $dApply -ConfigPath $ConfigPath -RepoRoot (Join-Path $dRoot 'repo') -SkipSourceConfig -ApplyRuntime -ApplyDatabase -ApplyIis
+& $httpsGuard -PublicHost $publicHost -SiteName ([string]$v.webSite)
 
 if($vChanged -and $RestartChangedStacks){
     $restart=Join-Path $vRoot 'ops\Start-GunnyServer.ps1'
@@ -112,6 +114,8 @@ foreach($row in $dRowsAfter){if($row.IP-ne$publicHost){throw "DDTank30 Server_Li
 if($dRowsAfter.Count-gt0 -and $dRowsAfter[0].Port-ne[int]$d.roadPort){throw 'DDTank30 primary Server_List port mismatch.'}
 $vBindings=@(Get-WebBinding -Name ([string]$v.webSite) -Protocol http|ForEach-Object{$_.bindingInformation})
 if($vBindings -notcontains "*:$([int]$v.webPort):" -and $vBindings -notcontains "$publicHost`:$([int]$v.webPort):"){throw 'v389 IIS binding mismatch.'}
+$vHttpsBindings=@(Get-WebBinding -Name ([string]$v.webSite) -Protocol https|ForEach-Object{$_.bindingInformation})
+if($vHttpsBindings -notcontains "$($publicHost):443:"){throw 'v389 AdminGunny HTTPS binding mismatch.'}
 $dWanted="$publicHost`:$([int]$d.webPort):"
 $dBindings=@(Get-WebBinding -Name ([string]$d.webSite) -Protocol http|ForEach-Object{$_.bindingInformation})
 if($dBindings -notcontains $dWanted){throw "DDTank30 IIS binding mismatch; expected $dWanted"}
@@ -125,6 +129,7 @@ if($canVerifyListeners){
 if(-not$SkipHttpProbe){
     Assert-Http200 "http://$publicHost/Gunny/login.htm"
     Assert-Http200 "http://$publicHost/Gunny/config.xml"
+    Assert-Http200 "https://$publicHost/AdminGunny/"
     Assert-Http200 "http://$publicHost`:$([int]$d.webPort)/"
     Assert-Http200 "http://$publicHost`:$([int]$d.webPort)/Request/CreateLogin.aspx"
 }
