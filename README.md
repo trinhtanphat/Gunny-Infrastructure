@@ -2,7 +2,7 @@
 
 Single-source endpoint management for the two Windows game stacks on one host:
 
-- Gunny legacy **v389** (client patch chain max 389 / operationally 3.8.9): web 80, game 9200, center 9202, fight 9208.
+- Gunny legacy **v389 family / 3.8.9**: web 80, game 9200, center 9202, fight 9208. The client content patch chain is forward-moving and must remain at version 389 or newer (currently v391).
 - DDTank **3.0**: web 8083, game 9300, center 9302, fight 9308.
 
 ## One server: change the IP in one place

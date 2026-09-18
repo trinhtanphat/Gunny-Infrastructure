@@ -130,5 +130,5 @@ if(-not$SkipHttpProbe){
 }
 [xml]$client=Get-Content (Join-Path $vRoot 'gunny\config.xml') -Raw
 $maxVersion=(@($client.SelectNodes('//version'))|ForEach-Object{[int]$_.to}|Measure-Object -Maximum).Maximum
-if($maxVersion-ne389){throw "Legacy client version drifted; expected v389, got $maxVersion"}
-Write-Host "ALL_GUNNY_INSTANCE_APPLY=PASS host=$publicHost v389=v389 ddtank30=3.0 backup=$backupRoot"
+if($maxVersion-lt389){throw "Legacy v389-family client chain drifted below compatibility floor 389; got $maxVersion"}
+Write-Host "ALL_GUNNY_INSTANCE_APPLY=PASS host=$publicHost v389Family=3.8.9 clientPatch=v$maxVersion ddtank30=3.0 backup=$backupRoot"

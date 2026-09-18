@@ -67,7 +67,7 @@ $rs=@{};foreach($n in $road.configuration.appSettings.add){$rs[[string]$n.key]=[
 foreach($pair in @(@('IP',$instance.PublicHost),@('Port',[string]$instance.RoadPort),@('LoginServerIp',$instance.PublicHost),@('LoginServerPort',[string]$instance.CenterPort),@('FightServerIp',$instance.PublicHost),@('FightServerPort',[string]$instance.FightPort))){if($rs[$pair[0]]-ne$pair[1]){throw "Road contract mismatch $($pair[0])=$($rs[$pair[0]]) expected $($pair[1])"}}
 [xml]$center=Get-Content (Join-Path $TargetRoot 'SERVER\center\Center.Service.exe.config') -Raw;$cs=@{};foreach($n in $center.configuration.appSettings.add){$cs[[string]$n.key]=[string]$n.value};if($cs.IP-ne$instance.PublicHost-or$cs.Port-ne[string]$instance.CenterPort){throw 'Center endpoint contract mismatch.'}
 [xml]$fight=Get-Content (Join-Path $TargetRoot 'SERVER\Fight\Fighting.Service.exe.config') -Raw;$fs=@{};foreach($n in $fight.configuration.appSettings.add){$fs[[string]$n.key]=[string]$n.value};if($fs.IP-ne$instance.PublicHost-or$fs.Port-ne[string]$instance.FightPort){throw 'Fight endpoint contract mismatch.'}
-[xml]$client=Get-Content (Join-Path $TargetRoot 'gunny\config.xml') -Raw;$versions=@($client.SelectNodes('//version'));$max=($versions|ForEach-Object{[int]$_.to}|Measure-Object -Maximum).Maximum;if($max-ne389){throw "Expected Gunny v389 client chain, got max version $max"}
+[xml]$client=Get-Content (Join-Path $TargetRoot 'gunny\config.xml') -Raw;$versions=@($client.SelectNodes('//version'));$max=($versions|ForEach-Object{[int]$_.to}|Measure-Object -Maximum).Maximum;if($max-lt389){throw "Expected Gunny v389-compatible client chain with max version >= 389, got $max"}
 
 if($ApplyDatabase){
     [xml]$runtimeRoad=Get-Content (Join-Path $TargetRoot 'SERVER\Road\Road.Service.exe.config') -Raw
@@ -88,4 +88,4 @@ if($ApplyIis){
     $bindings=@(Get-WebBinding -Name $instance.WebSite -Protocol http)
     if(-not($bindings|Where-Object{$_.bindingInformation -eq "*:$($instance.WebPort):" -or $_.bindingInformation -eq "$($instance.PublicHost):$($instance.WebPort):"})){throw "IIS site $($instance.WebSite) has no compatible port $($instance.WebPort) binding."}
 }
-Write-Host "GUNNY_V389_INSTANCE_APPLY=PASS old=$oldHost new=$($instance.PublicHost) replacements=$total client=v389 config=$($instance.ConfigPath)"
+Write-Host "GUNNY_V389_INSTANCE_APPLY=PASS old=$oldHost new=$($instance.PublicHost) replacements=$total client=v$max config=$($instance.ConfigPath)"
