@@ -90,7 +90,7 @@ function Set-DDTank30ConfigSet([string]$Root,[switch]$RuntimeLayout) {
         $center = Join-Path $Root 'Center.Service\App.config'
         $fight = Join-Path $Root 'Fighting.Service\App.config'
     }
-    Set-AppSettingValue $game 'IP' $instance.PublicHost
+    Set-AppSettingValue $game 'IP' $instance.InternalHost
     Set-AppSettingValue $game 'Port' ([string]$instance.RoadPort)
     Set-AppSettingValue $game 'LoginServerIp' $instance.CenterHost
     Set-AppSettingValue $game 'LoginServerPort' ([string]$instance.CenterPort)
@@ -238,4 +238,4 @@ if ($ApplyIis) {
     }
 }
 
-Write-Host "DDTANK30_INSTANCE_APPLY=PASS host=$($instance.PublicHost) web=$($instance.WebPort) game=$($instance.RoadPort) config=$($instance.ConfigPath)"
+Write-Host "DDTANK30_INSTANCE_APPLY=PASS public=$($instance.PublicHost) internal=$($instance.InternalHost) web=$($instance.WebPort) game=$($instance.RoadPort) config=$($instance.ConfigPath)"

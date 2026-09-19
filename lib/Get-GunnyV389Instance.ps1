@@ -9,6 +9,8 @@ function Get-GunnyV389Instance {
     if(-not(Test-Path -LiteralPath $ConfigPath)){throw "Gunny instance config not found: $ConfigPath"}
     $all=Get-Content -LiteralPath $ConfigPath -Raw|ConvertFrom-Json
     if(-not $all.publicHost){throw 'Instance config is missing publicHost.'}
+    $internalHost=if($all.internalHost){[string]$all.internalHost}else{'127.0.0.1'}
+    if($internalHost-ne'127.0.0.1'){throw 'internalHost must be 127.0.0.1 for single-host Gunny runtime.'}
     if(-not $all.legacyV389){throw 'Instance config is missing legacyV389.'}
     $v=$all.legacyV389
     foreach($name in @('root','webSite','webPort','roadPort','centerPort','fightPort','centerWcfHttpPort','centerWcfTcpPort')){
@@ -17,6 +19,7 @@ function Get-GunnyV389Instance {
     [pscustomobject]@{
         ConfigPath=(Resolve-Path -LiteralPath $ConfigPath).Path
         PublicHost=[string]$all.publicHost
+        InternalHost=$internalHost
         Root=[string]$v.root
         WebSite=[string]$v.webSite
         WebPort=[int]$v.webPort

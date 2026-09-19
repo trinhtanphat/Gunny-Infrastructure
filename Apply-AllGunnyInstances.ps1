@@ -30,7 +30,12 @@ function Get-ServerRows([string]$ConnectionString,[int[]]$Ids) {
         $r.Close();$rows
     } finally {$cn.Close()}
 }
-function Wait-Listener([string]$Address,[int]$Port,[int]$Seconds=150) {
+function Test-ListenerNow([string]$Address,[int]$Port) {
+    return @(
+        Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+        Where-Object { $_.LocalPort-eq$Port -and ($_.LocalAddress-eq$Address -or $_.LocalAddress-eq'0.0.0.0') }
+    ).Count -gt 0
+}function Wait-Listener([string]$Address,[int]$Port,[int]$Seconds=150) {
     $end=(Get-Date).AddSeconds($Seconds)
     do {
         $hit=@(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue|Where-Object{$_.LocalPort-eq$Port -and ($_.LocalAddress-eq$Address -or $_.LocalAddress-eq'0.0.0.0')})
@@ -38,6 +43,16 @@ function Wait-Listener([string]$Address,[int]$Port,[int]$Seconds=150) {
         Start-Sleep -Milliseconds 500
     } while((Get-Date)-lt$end)
     throw "Listener not ready: $Address`:$Port"
+}
+function Set-EdgePortProxy([string]$ListenAddress,[int]$ListenPort,[string]$ConnectAddress,[int]$ConnectPort,[string]$OldListenAddress='') {
+    Set-Service -Name iphlpsvc -StartupType Automatic
+    if((Get-Service iphlpsvc).Status-ne'Running'){Start-Service iphlpsvc}
+    if($OldListenAddress -and $OldListenAddress-ne$ListenAddress){
+        & netsh interface portproxy delete v4tov4 listenaddress=$OldListenAddress listenport=$ListenPort | Out-Null
+    }
+    & netsh interface portproxy delete v4tov4 listenaddress=$ListenAddress listenport=$ListenPort | Out-Null
+    & netsh interface portproxy add v4tov4 listenaddress=$ListenAddress listenport=$ListenPort connectaddress=$ConnectAddress connectport=$ConnectPort | Out-Null
+    if($LASTEXITCODE-ne0){throw ("Failed to create edge portproxy {0}:{1} -> {2}:{3}" -f $ListenAddress,$ListenPort,$ConnectAddress,$ConnectPort)}
 }
 function Assert-Http200([string]$Uri) {
     $r=Invoke-WebRequest -Uri $Uri -UseBasicParsing -TimeoutSec 12 -ErrorAction Stop
@@ -49,6 +64,8 @@ if(-not(Test-Path -LiteralPath $ConfigPath)){throw "Instance config missing: $Co
 $cfg=Get-Content -LiteralPath $ConfigPath -Raw|ConvertFrom-Json
 if(-not$cfg.publicHost -or -not$cfg.legacyV389 -or -not$cfg.ddtank30){throw 'Instance config requires publicHost, legacyV389 and ddtank30.'}
 $publicHost=[string]$cfg.publicHost
+$internalHost=if($cfg.internalHost){[string]$cfg.internalHost}else{'127.0.0.1'}
+if($internalHost-ne'127.0.0.1'){throw "internalHost must be 127.0.0.1; got $internalHost"}
 $v=$cfg.legacyV389;$d=$cfg.ddtank30
 $localIps=@(Get-NetIPAddress -AddressFamily IPv4 -ErrorAction Stop|Select-Object -ExpandProperty IPAddress)
 if($localIps -notcontains $publicHost){throw "publicHost $publicHost is not assigned to this server. Configure the NIC first."}
@@ -61,10 +78,17 @@ $httpsGuard=Join-Path $PSScriptRoot 'lib\Ensure-GunnyAdminHttps.ps1'
 $adminStaticGuard=Join-Path $PSScriptRoot 'lib\Ensure-GunnyAdminStaticAliases.ps1'
 foreach($tool in @($vApply,$dApply,$vResourceGuard,$httpsGuard,$adminStaticGuard)){if(-not(Test-Path -LiteralPath $tool)){throw "Apply tool missing: $tool"}}
 $vWeb=Join-Path $vRoot 'gunny\Web.config'
+$vRoad=Join-Path $vRoot 'SERVER\Road\Road.Service.exe.config'
 $dRoad=Join-Path $dRoot 'runtime\game\Road.Service.exe.config'
-$oldV=Read-AppSetting $vWeb 'ActiveIP';$oldD=Read-AppSetting $dRoad 'IP'
-$vChanged=$oldV-ne$publicHost;$dChanged=$oldD-ne$publicHost
-Write-Host "INSTANCE_PLAN host=$publicHost v389:$oldV->$publicHost ddtank30:$oldD->$publicHost apply=$Apply restartChanged=$RestartChangedStacks"
+$oldVPublic=Read-AppSetting $vWeb 'ActiveIP'
+$oldVRuntime=Read-AppSetting $vRoad 'IP'
+$oldDRuntime=Read-AppSetting $dRoad 'IP'
+$vListenersInternal=(Test-ListenerNow $internalHost ([int]$v.roadPort)) -and (Test-ListenerNow $internalHost ([int]$v.centerPort)) -and (Test-ListenerNow $internalHost ([int]$v.fightPort))
+$dListenersInternal=(Test-ListenerNow $internalHost ([int]$d.roadPort)) -and (Test-ListenerNow $internalHost ([int]$d.centerPort)) -and (Test-ListenerNow $internalHost ([int]$d.fightPort))
+$vChanged=($oldVRuntime-ne$internalHost)-or(-not$vListenersInternal)
+$dChanged=($oldDRuntime-ne$internalHost)-or(-not$dListenersInternal)
+$publicChanged=$oldVPublic-ne$publicHost
+Write-Host "INSTANCE_PLAN public=$oldVPublic->$publicHost internal=$internalHost v389Runtime=$oldVRuntime->$internalHost ddtank30Runtime=$oldDRuntime->$internalHost apply=$Apply restartChanged=$RestartChangedStacks"
 if(-not$Apply){Write-Host 'INSTANCE_VALIDATE_ONLY=PASS';return}
 
 $stamp=Get-Date -Format 'yyyyMMdd-HHmmss'
@@ -81,7 +105,7 @@ $vCon=Read-AppSetting (Join-Path $vRoot 'SERVER\Road\Road.Service.exe.config') '
 $vRows=Get-ServerRows $vCon @($v.databaseServerIds|ForEach-Object{[int]$_})
 $dRows=Get-ServerRows 'Data Source=.\SQLEXPRESS;Initial Catalog=Db_Tank_V30;Integrated Security=True' @($d.databaseServerIds|ForEach-Object{[int]$_})
 Import-Module WebAdministration
-$snapshot=[ordered]@{timestamp=(Get-Date).ToString('o');publicHost=$publicHost;oldV389Host=$oldV;oldDdtank30Host=$oldD;v389Rows=$vRows;ddtank30Rows=$dRows;v389Bindings=@(Get-WebBinding -Name ([string]$v.webSite) -Protocol http|ForEach-Object{$_.bindingInformation});ddtank30Bindings=@(Get-WebBinding -Name ([string]$d.webSite) -Protocol http|ForEach-Object{$_.bindingInformation})}
+$snapshot=[ordered]@{timestamp=(Get-Date).ToString('o');publicHost=$publicHost;oldV389PublicHost=$oldVPublic;oldV389RuntimeHost=$oldVRuntime;oldDdtank30RuntimeHost=$oldDRuntime;v389Rows=$vRows;ddtank30Rows=$dRows;v389Bindings=@(Get-WebBinding -Name ([string]$v.webSite) -Protocol http|ForEach-Object{$_.bindingInformation});ddtank30Bindings=@(Get-WebBinding -Name ([string]$d.webSite) -Protocol http|ForEach-Object{$_.bindingInformation})}
 [IO.File]::WriteAllText((Join-Path $backupRoot 'snapshot.json'),($snapshot|ConvertTo-Json -Depth 8),(New-Object Text.UTF8Encoding($false)))
 [IO.File]::WriteAllText((Join-Path $PSScriptRoot 'last-backup.txt'),$backupRoot,(New-Object Text.UTF8Encoding($false)))
 Write-Host "BACKUP_READY=$backupRoot"
@@ -105,10 +129,15 @@ if($dChanged -and $RestartChangedStacks){
     & $stop
     Start-ScheduledTask -TaskName 'DDTank30-Stack'
 }
-if(($vChanged-or$dChanged)-and-not$RestartChangedStacks){Write-Warning 'Host changed but restart was disabled; processes still need restart before listeners use the new host.'}
+if(($vChanged-or$dChanged)-and-not$RestartChangedStacks){Write-Warning 'Internal host changed but restart was disabled; processes still need restart before listeners use loopback.'}
+if($RestartChangedStacks -or -not($vChanged-or$dChanged)){
+    Set-EdgePortProxy -ListenAddress $publicHost -ListenPort ([int]$v.roadPort) -ConnectAddress $internalHost -ConnectPort ([int]$v.roadPort) -OldListenAddress $oldVPublic
+    Set-EdgePortProxy -ListenAddress $publicHost -ListenPort ([int]$d.roadPort) -ConnectAddress $internalHost -ConnectPort ([int]$d.roadPort) -OldListenAddress $oldVPublic
+    Write-Host "EDGE_PROXY_READY public=$publicHost v389=$($v.roadPort) ddtank30=$($d.roadPort) internal=$internalHost"
+}
 
 if((Read-AppSetting $vWeb 'ActiveIP')-ne$publicHost){throw 'v389 ActiveIP post-apply mismatch.'}
-if((Read-AppSetting $dRoad 'IP')-ne$publicHost){throw 'DDTank30 runtime IP post-apply mismatch.'}
+if((Read-AppSetting $dRoad 'IP')-ne$internalHost){throw 'DDTank30 runtime IP post-apply mismatch.'}
 $vRowsAfter=Get-ServerRows $vCon @($v.databaseServerIds|ForEach-Object{[int]$_})
 foreach($row in $vRowsAfter){if($row.IP-ne$publicHost){throw "v389 Server_List ID=$($row.ID) host mismatch: $($row.IP)"}}
 if($vRowsAfter.Count-gt0 -and $vRowsAfter[0].Port-ne[int]$v.roadPort){throw 'v389 primary Server_List port mismatch.'}
@@ -125,9 +154,10 @@ if($dBindings -notcontains $dWanted){throw "DDTank30 IIS binding mismatch; expec
 
 $canVerifyListeners=(-not($vChanged-or$dChanged))-or$RestartChangedStacks
 if($canVerifyListeners){
-    [void](Wait-Listener $publicHost ([int]$v.roadPort));[void](Wait-Listener $publicHost ([int]$v.centerPort));[void](Wait-Listener $publicHost ([int]$v.fightPort))
-    [void](Wait-Listener $publicHost ([int]$d.roadPort));[void](Wait-Listener ([string]$d.centerHost) ([int]$d.centerPort));[void](Wait-Listener ([string]$d.fightHost) ([int]$d.fightPort))
-    Write-Host 'LISTENER_CONTRACT=PASS'
+    [void](Wait-Listener $internalHost ([int]$v.roadPort));[void](Wait-Listener $internalHost ([int]$v.centerPort));[void](Wait-Listener $internalHost ([int]$v.fightPort))
+    [void](Wait-Listener $internalHost ([int]$d.roadPort));[void](Wait-Listener $internalHost ([int]$d.centerPort));[void](Wait-Listener $internalHost ([int]$d.fightPort))
+    [void](Wait-Listener $publicHost ([int]$v.roadPort));[void](Wait-Listener $publicHost ([int]$d.roadPort))
+    Write-Host 'LISTENER_CONTRACT=PASS internal=127.0.0.1 edgeRoadPorts=9200,9300'
 }
 if(-not$SkipHttpProbe){
     Assert-Http200 "http://$publicHost/Gunny/login.htm"
@@ -139,4 +169,4 @@ if(-not$SkipHttpProbe){
 [xml]$client=Get-Content (Join-Path $vRoot 'gunny\config.xml') -Raw
 $maxVersion=(@($client.SelectNodes('//version'))|ForEach-Object{[int]$_.to}|Measure-Object -Maximum).Maximum
 if($maxVersion-lt389){throw "Legacy v389-family client chain drifted below compatibility floor 389; got $maxVersion"}
-Write-Host "ALL_GUNNY_INSTANCE_APPLY=PASS host=$publicHost v389Family=3.8.9 clientPatch=v$maxVersion ddtank30=3.0 backup=$backupRoot"
+Write-Host "ALL_GUNNY_INSTANCE_APPLY=PASS public=$publicHost internal=$internalHost v389Family=3.8.9 clientPatch=v$maxVersion ddtank30=3.0 backup=$backupRoot"

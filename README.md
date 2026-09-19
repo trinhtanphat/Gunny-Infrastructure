@@ -2,12 +2,12 @@
 
 Single-source endpoint management for the two Windows game stacks on one host:
 
-- Gunny legacy **v389 family / 3.8.9**: web 80, game 9200, center 9202, fight 9208. The client content patch chain is forward-moving and must remain at version 389 or newer (currently v391).
+- Gunny legacy **v389 family / 3.8.9**: web 80, game 9200, center 9202, fight 9208. The client content patch chain is forward-moving and must remain at version 389 or newer (currently v392).
 - DDTank **3.0**: web 8083, game 9300, center 9302, fight 9308.
 
 ## One server: change the IP in one place
 
-The live manifest is `C:\Gunny-Infra\server-instance.json`. Only `publicHost` changes when the public IPv4 address changes; edition ports stay in the same manifest.
+The live manifest is `C:\Gunny-Infra\server-instance.json`. Runtime services use `internalHost=127.0.0.1`; only `publicHost` changes when the public IPv4 address changes. Edition ports stay in the same manifest.
 
 Apply/verify the current manifest:
 
@@ -22,6 +22,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File C:\Gunny-Infra\Set-GunnyPubl
 ```
 
 The new IPv4 address must already be assigned to the server NIC. A changed host restarts only the affected stack by default. Each apply backs up managed runtime files, DB `Server_List` rows and IIS bindings before mutation, then verifies config, DB, IIS, listeners, HTTP endpoints and v389 client version.
+
+Runtime contract: Road/Center/Fight bind to `127.0.0.1` on the game host. Only Road is published externally through a Windows edge port proxy (`publicHost:9200 -> 127.0.0.1:9200` and `publicHost:9300 -> 127.0.0.1:9300`). DB `Server_List` and browser-facing URLs keep `publicHost`, so remote clients never receive `127.0.0.1`.
 
 ## Fleet / 100 servers
 

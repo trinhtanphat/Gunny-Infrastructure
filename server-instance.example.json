@@ -21,14 +21,13 @@
                      "webSite":  "DDTank30-3.0",
                      "webPort":  8083,
                      "roadPort":  9300,
-                     "centerHost":  "127.0.0.1",
                      "centerPort":  9302,
-                     "fightHost":  "127.0.0.1",
                      "fightPort":  9308,
                      "centerWcfHttpPort":  2308,
                      "centerWcfTcpPort":  2309,
                      "databaseServerIds":  [
                                                4
                                            ]
-                 }
+                 },
+    "internalHost":  "127.0.0.1"
 }

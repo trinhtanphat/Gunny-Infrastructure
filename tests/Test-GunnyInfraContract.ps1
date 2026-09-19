@@ -58,4 +58,7 @@ $observedRows=@(Import-Csv (Join-Path $root 'lib\v389-observed-ruffle-manifest.t
 if(@($observedRows|Where-Object sourceMode -eq 'embedded').Count-ne1){throw 'Observed manifest embedded-source count mismatch'}
 if(@($observedRows|Where-Object sourceRepo -eq 'trinhtanphat/Resource-pnkl1999').Count-ne9){throw 'Observed manifest legacy-map source count mismatch'}
 if((Get-FileHash (Join-Path $root 'resources\v389-sinplelight-5.swf') -Algorithm SHA256).Hash-ne'9500C3035FECEE24FFA29D71803FEC2D871B8985F64C37F2436A55BC9BF7CF1E'){throw 'Embedded sinplelight hash mismatch'}
+if([string]$example.internalHost -ne '127.0.0.1'){throw 'Example manifest internalHost must be 127.0.0.1.'}
+if($dd30Apply -notmatch 'InternalHost'){throw 'DDTank30 apply must use InternalHost.'}
+foreach($token in @('internalHost','Set-EdgePortProxy','127.0.0.1')){if($applyRaw -notmatch [regex]::Escape($token)){throw ('Apply-All loopback/edge contract missing token: '+$token)}}
 Write-Host 'GUNNY_INFRA_CONTRACT=PASS'
