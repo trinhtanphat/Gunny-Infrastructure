@@ -1,6 +1,9 @@
 backups/
 manifest-backups/
 last-backup.txt
+last-quest-progression-backup.txt
+resource-cache/
+resource-sources/
 server-instance.json
 fleet.json
 *.log
