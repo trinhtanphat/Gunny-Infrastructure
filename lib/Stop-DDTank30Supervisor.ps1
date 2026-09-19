@@ -1,6 +1,7 @@
 param(
   [string]$TaskName='DDTank30-Stack',
-  [string]$RuntimeRoot='C:\Gunny-DDTank30\runtime'
+  [string]$RuntimeRoot='C:\Gunny-DDTank30\runtime',
+  [string]$InternalHost='127.0.0.1'
 )
 $ErrorActionPreference='Stop'
 $task=Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
@@ -17,6 +18,6 @@ foreach($p in $targets|Sort-Object ProcessId -Descending){Write-Host ("Stopping 
 $deadline=(Get-Date).AddSeconds(10)
 do{Start-Sleep -Milliseconds 250;$remaining=Get-RuntimeProcesses}while($remaining.Count-gt0 -and (Get-Date)-lt$deadline)
 if($remaining.Count-gt0){throw "DDTank30 runtime processes remain: $($remaining.ProcessId -join ',')"}
-$busy=@(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue|Where-Object{$_.LocalPort-in 9300,9302,9308})
-if($busy.Count-gt0){throw "DDTank30 ports still listening: $($busy.LocalPort -join ',')"}
+$busy=@(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue|Where-Object{$_.LocalAddress-eq$InternalHost -and $_.LocalPort-in 9300,9302,9308})
+if($busy.Count-gt0){throw "DDTank30 internal ports still listening on ${InternalHost}: $($busy.LocalPort -join ',')"}
 Write-Host 'PASS: DDTank30 supervisor and runtime children stopped.'

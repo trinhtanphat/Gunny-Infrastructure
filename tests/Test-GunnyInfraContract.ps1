@@ -61,4 +61,7 @@ if((Get-FileHash (Join-Path $root 'resources\v389-sinplelight-5.swf') -Algorithm
 if([string]$example.internalHost -ne '127.0.0.1'){throw 'Example manifest internalHost must be 127.0.0.1.'}
 if($dd30Apply -notmatch 'InternalHost'){throw 'DDTank30 apply must use InternalHost.'}
 foreach($token in @('internalHost','Set-EdgePortProxy','127.0.0.1')){if($applyRaw -notmatch [regex]::Escape($token)){throw ('Apply-All loopback/edge contract missing token: '+$token)}}
+$dd30StopRaw=Get-Content (Join-Path $root 'lib\Stop-DDTank30Supervisor.ps1') -Raw
+if($dd30StopRaw -notmatch "InternalHost='127\.0\.0\.1'"){throw 'Stop-DDTank30Supervisor loopback contract must default InternalHost to 127.0.0.1.'}
+if($dd30StopRaw -notmatch 'LocalAddress-eq\$InternalHost'){throw 'Stop-DDTank30Supervisor loopback contract must filter listener checks by InternalHost.'}
 Write-Host 'GUNNY_INFRA_CONTRACT=PASS'
